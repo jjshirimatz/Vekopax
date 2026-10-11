@@ -1,0 +1,902 @@
+<meta name='viewport' content='width=device-width, initial-scale=1'/><!DOCTYPE html>
+<html lang="sw">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>VEKOPAX Translator</title>
+  <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #0b57d0;
+      --surface: #ffffff;
+      --background: #f8f9fa;
+      --text-main: #1f1f1f;
+      --text-sub: #5f6368;
+      --border: #c4c7c5;
+      --accent: #fbbc04;
+      --danger: #d93025;
+      --soft: #f0f4f9;
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Roboto', Arial, sans-serif;
+      background-color: var(--background);
+      margin: 0;
+      padding: 0;
+      color: var(--text-main);
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    /* Splash / Country Selection Screen Style */
+    #splashScreen {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: linear-gradient(135deg, #0044cc, #0077ff);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      padding: 24px;
+      color: white;
+      text-align: center;
+    }
+
+    .splash-logo {
+      font-size: 32px;
+      font-weight: 900;
+      letter-spacing: 2px;
+      margin-bottom: 8px;
+    }
+
+    .splash-subtitle {
+      font-size: 15px;
+      opacity: 0.9;
+      margin-bottom: 36px;
+    }
+
+    .country-btn {
+      width: 100%;
+      max-width: 340px;
+      background: rgba(255, 255, 255, 0.15);
+      border: 1px solid rgba(255, 255, 255, 0.3);
+      color: white;
+      padding: 16px 20px;
+      border-radius: 30px;
+      font-size: 16px;
+      font-weight: 700;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      margin-bottom: 14px;
+      backdrop-filter: blur(10px);
+      transition: background 0.2s ease;
+    }
+
+    .country-btn:active {
+      background: rgba(255, 255, 255, 0.3);
+    }
+
+    /* Main App Container */
+    #mainApp {
+      display: none;
+    }
+
+    .header {
+      background: var(--surface);
+      color: var(--primary);
+      padding: 12px 16px;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      gap: 10px;
+    }
+
+    .brand-name {
+      font-size: 22px;
+      font-weight: 900;
+      letter-spacing: 1px;
+      white-space: nowrap;
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .privacy-top-btn {
+      border: 1px solid var(--border);
+      background: #f0f4f9;
+      color: var(--text-sub);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      flex-shrink: 0;
+    }
+
+    .privacy-top-btn .material-icons {
+      font-size: 20px;
+    }
+
+    .container {
+      width: 92%;
+      max-width: 480px;
+      margin: 14px auto;
+      padding-bottom: 56px;
+    }
+
+    .card {
+      background: var(--surface);
+      padding: 16px;
+      border-radius: 24px;
+      box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+      margin-bottom: 14px;
+      border: 1px solid #f0f0f0;
+    }
+
+    .lang-selector-row {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+      margin-bottom: 10px;
+    }
+
+    .translation-select {
+      padding: 12px 14px;
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      font-size: 15px;
+      flex: 1;
+      outline: none;
+      background-color: #fff;
+      color: var(--text-main);
+    }
+
+    .swap-btn {
+      background: #f0f4f9;
+      border: 1px solid var(--border);
+      border-radius: 50%;
+      width: 42px;
+      height: 42px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      color: var(--primary);
+      flex-shrink: 0;
+    }
+
+    .swap-btn .material-icons {
+      font-size: 22px;
+    }
+
+    .input-area {
+      position: relative;
+    }
+
+    textarea {
+      width: 100%;
+      height: 118px;
+      padding: 10px 12px;
+      border: none;
+      font-size: 17px;
+      outline: none;
+      resize: none;
+      background: transparent;
+      color: var(--text-main);
+      line-height: 1.45;
+      font-family: inherit;
+    }
+
+    .char-counter {
+      text-align: right;
+      font-size: 11px;
+      color: #80868b;
+      padding: 0 12px 6px;
+    }
+
+    .output-box {
+      margin-top: 4px;
+      padding: 16px;
+      background: var(--soft);
+      border-radius: 18px;
+      min-height: 64px;
+      font-size: 17px;
+      color: var(--primary);
+      font-weight: 500;
+      word-wrap: break-word;
+      line-height: 1.45;
+      transition: opacity 0.25s ease;
+    }
+
+    .action-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-top: 12px;
+      gap: 8px;
+    }
+
+    .btn-main {
+      background: var(--primary);
+      color: white;
+      border: none;
+      padding: 13px 24px;
+      border-radius: 30px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      flex: 1;
+      justify-content: center;
+      font-size: 15px;
+    }
+
+    .btn-main .material-icons {
+      font-size: 20px;
+    }
+
+    .btn-icon {
+      background: none;
+      border: none;
+      color: var(--text-sub);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      min-width: 40px;
+      min-height: 40px;
+    }
+
+    .btn-icon .material-icons {
+      font-size: 28px;
+    }
+
+    .icon-group {
+      display: flex;
+      align-items: center;
+      gap: 2px;
+    }
+
+    .phrase-section {
+      margin-bottom: 12px;
+      padding: 0 2px;
+    }
+
+    .phrase-label {
+      font-size: 14px;
+      font-weight: 700;
+      color: var(--text-sub);
+      margin-bottom: 10px;
+      display: block;
+    }
+
+    .phrase-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+    }
+
+    .phrase-chip {
+      background: #fff;
+      border: 1px solid var(--border);
+      padding: 9px 14px;
+      border-radius: 18px;
+      font-size: 14px;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      color: var(--text-main);
+    }
+
+    .section-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-bottom: 10px;
+      font-weight: 700;
+      color: var(--text-sub);
+      font-size: 15px;
+      gap: 8px;
+    }
+
+    .section-title {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .section-title .material-icons {
+      font-size: 18px;
+    }
+
+    .text-link-btn {
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: var(--danger);
+      font-size: 13px;
+      padding: 0;
+      font-family: inherit;
+    }
+
+    .item-list {
+      max-height: 220px;
+      overflow-y: auto;
+    }
+
+    .list-item {
+      padding: 12px;
+      border-bottom: 1px solid #f1f3f4;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      cursor: pointer;
+      border-radius: 10px;
+    }
+
+    .list-item:last-child {
+      border-bottom: none;
+    }
+
+    .list-item:active {
+      background-color: #f0f4f9;
+    }
+
+    .orig-text {
+      font-size: 13px;
+      color: var(--text-sub);
+      opacity: 0.85;
+      line-height: 1.4;
+    }
+
+    .tran-text {
+      font-size: 16px;
+      color: var(--primary);
+      font-weight: 700;
+      line-height: 1.4;
+    }
+
+    .empty-state {
+      text-align: center;
+      color: #999;
+      font-size: 13px;
+      padding: 22px 8px 8px;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 1001;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.5);
+      backdrop-filter: blur(4px);
+      padding: 16px;
+    }
+
+    .modal-content {
+      background: white;
+      margin: 10% auto;
+      padding: 24px;
+      width: 100%;
+      max-width: 480px;
+      max-height: 78vh;
+      border-radius: 28px;
+      overflow-y: auto;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.16);
+    }
+
+    .modal-content h2,
+    .modal-content h3 {
+      margin-top: 0;
+      margin-bottom: 14px;
+      color: var(--primary);
+    }
+
+    .modal-content p,
+    .modal-content li {
+      color: var(--text-main);
+      line-height: 1.6;
+      font-size: 15px;
+    }
+
+    .footer-link {
+      text-align: center;
+      color: var(--text-sub);
+      font-size: 12px;
+      margin-top: 18px;
+      cursor: pointer;
+      text-decoration: underline;
+      padding-bottom: 10px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- SKRINI YA KUCHAGUA NCHI (SPLASH SCREEN) -->
+  <div id="splashScreen">
+    <div class="splash-logo">VEKOPAX</div>
+    <div class="splash-subtitle">Select your country to proceed</div>
+    
+    <button class="country-btn" onclick="selectCountry('tz')" type="button">
+      <span>TANZANIA</span>
+      <i class="material-icons">chevron_right</i>
+    </button>
+    
+    <button class="country-btn" onclick="selectCountry('ke')" type="button">
+      <span>KENYA</span>
+      <i class="material-icons">chevron_right</i>
+    </button>
+  </div>
+
+  <!-- APP KUU YA TRANSLATOR -->
+  <div id="mainApp">
+    <div class="header">
+      <div class="brand-name">VEKOPAX</div>
+
+      <div class="header-actions">
+        <button class="privacy-top-btn" onclick="toggleModal('pModal', true)" type="button" aria-label="Privacy Policy">
+          <i class="material-icons">shield</i>
+        </button>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="card">
+        <div class="lang-selector-row">
+          <select id="langOption" class="translation-select" aria-label="Translation direction">
+            <option value="en-sw" data-sw="Kiingereza ➔ Kiswahili" data-en="English ➔ Swahili">Kiingereza ➔ Kiswahili</option>
+            <option value="sw-en" data-sw="Kiswahili ➔ Kiingereza" data-en="Swahili ➔ English">Kiswahili ➔ Kiingereza</option>
+          </select>
+          <button class="swap-btn" onclick="swapLanguages()" type="button" aria-label="Swap languages">
+            <i class="material-icons">swap_horiz</i>
+          </button>
+        </div>
+
+        <div class="input-area">
+          <textarea id="userInput" maxlength="500" oninput="updateCharCount()" aria-label="Text input"></textarea>
+          <div class="char-counter" id="charCount">0 / 500</div>
+        </div>
+
+        <div class="output-box" id="resultText">Matokeo yataonekana hapa...</div>
+
+        <div class="action-row">
+          <button class="btn-icon" onclick="clearField()" type="button" aria-label="Clear">
+            <i class="material-icons">delete_outline</i>
+          </button>
+
+          <button class="btn-main" onclick="startTranslation()" id="translateBtn" type="button">
+            <i class="material-icons">translate</i>
+            <span>TAFSIRI</span>
+          </button>
+
+          <div class="icon-group">
+            <button class="btn-icon" onclick="toggleFavorite()" type="button" aria-label="Favorite">
+              <i class="material-icons" id="favIcon">star_border</i>
+            </button>
+            <button class="btn-icon" onclick="copyResult()" type="button" aria-label="Copy">
+              <i class="material-icons" id="copyIcon">content_copy</i>
+            </button>
+          </div>
+        </div>
+      </div>
+
+      <div class="phrase-section">
+        <span class="phrase-label" id="phraseLabel">Maneno ya Haraka</span>
+        <div class="phrase-container" id="phraseContainer"></div>
+      </div>
+
+      <div class="card" id="favCard" style="display:none;">
+        <div class="section-header">
+          <span class="section-title">
+            <i class="material-icons" style="color:var(--accent);">star</i>
+            <span id="textFav">Unayopenda</span>
+          </span>
+          <button class="text-link-btn" onclick="clearAllItems('v_favs')" id="btnClearFav" type="button">Futa Yote</button>
+        </div>
+        <div id="favContainer" class="item-list"></div>
+      </div>
+
+      <div class="card">
+        <div class="section-header">
+          <span class="section-title">
+            <i class="material-icons">history</i>
+            <span id="textHist">Historia</span>
+          </span>
+          <button class="text-link-btn" onclick="openConfirm()" id="btnClearHist" type="button">Futa Historia</button>
+        </div>
+        <div id="historyContainer" class="item-list"></div>
+      </div>
+
+      <p class="footer-link" onclick="toggleModal('pModal', true)" id="textPrivacy">VEKOPAX Privacy & Data Safety</p>
+    </div>
+
+    <div id="pModal" class="modal" onclick="handleBackdropClose(event, 'pModal')">
+      <div class="modal-content" id="privacyContent"></div>
+    </div>
+
+    <div id="confirmDialog" class="modal" onclick="handleBackdropClose(event, 'confirmDialog')">
+      <div class="modal-content" style="margin-top:45%;">
+        <h3 id="confirmTitle">Futa Historia?</h3>
+        <p id="confirmMsg">Je, una uhakika unataka kufuta historia ya VEKOPAX?</p>
+        <div style="display:flex; justify-content:flex-end; gap:12px; margin-top:20px;">
+          <button style="border:none; background:none; cursor:pointer; color:var(--text-sub); font-weight:700;" onclick="toggleModal('confirmDialog', false)" id="btnCancel" type="button">GHAIRI</button>
+          <button class="btn-main" style="background:#d93025; flex:0 0 auto;" id="confirmBtn" type="button">FUTA YOTE</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    let currentTranslation = { orig: "", tran: "" };
+    let currentUILang = "sw";
+
+    const langData = {
+      sw: {
+        htmlLang: "sw",
+        placeholder: "Andika hapa...",
+        resultDefault: "Matokeo yataonekana hapa...",
+        translating: "Inatafsiri...",
+        errorText: "Hitilafu imetokea.",
+        btnTranslate: "TAFSIRI",
+        history: "Historia",
+        favs: "Unayopenda",
+        clearAll: "Futa Yote",
+        clearHist: "Futa Historia",
+        privacyLink: "VEKOPAX Privacy & Data Safety",
+        confirmTitle: "Futa Historia?",
+        confirmMsg: "Je, una uhakika unataka kufuta historia ya VEKOPAX?",
+        btnCancel: "GHAIRI",
+        btnDelete: "FUTA YOTE",
+        phraseLabel: "Maneno ya Haraka",
+        emptyHistory: "Hakuna historia bado",
+        emptyFavs: "Hakuna vipendwa bado",
+        phrases: [
+          "Habari",
+          "U hali gani?",
+          "Asante",
+          "Nimekukumbuka",
+          "Habari za asubuhi",
+          "Nakupenda",
+          "Uko wapi?",
+          "Bei gani?"
+        ],
+        policyTitle: "VEKOPAX Privacy Policy",
+        policyText: `
+          <p><strong>1. Usalama wa Taarifa:</strong> Hatukusanyi wala kuhifadhi taarifa zako binafsi.</p>
+          <p><strong>2. Uchakataji wa Tafsiri:</strong> Tunatumia huduma salama na zinazoaminika za third-party kuchakata maandishi unayoingiza kwa muda halisi ili kutoa tafsiri. Huduma hizi hutumika kwa matokeo ya tafsiri pekee.</p>
+          <p><strong>3. Uhifadhi wa Kifaa:</strong> Historia na vipendwa huhifadhiwa kwenye simu yako tu. Hatuwezi kuvifikia kwa mbali.</p>
+          <button class="btn-main" style="width:100%; justify-content:center; margin-top:20px;" onclick="toggleModal('pModal', false)" type="button">NAELEWA</button>
+        `
+      },
+      en: {
+        htmlLang: "en",
+        placeholder: "Type here...",
+        resultDefault: "Translation results appear here...",
+        translating: "Translating...",
+        errorText: "An error occurred.",
+        btnTranslate: "TRANSLATE",
+        history: "History",
+        favs: "Favorites",
+        clearAll: "Clear All",
+        clearHist: "Clear History",
+        privacyLink: "VEKOPAX Privacy & Data Safety",
+        confirmTitle: "Clear History?",
+        confirmMsg: "Are you sure you want to clear VEKOPAX history?",
+        btnCancel: "CANCEL",
+        btnDelete: "DELETE ALL",
+        phraseLabel: "Quick Phrases",
+        emptyHistory: "No history yet",
+        emptyFavs: "No favorites yet",
+        phrases: [
+          "Hello",
+          "How are you?",
+          "Thank you",
+          "I miss you",
+          "Good morning",
+          "I love you",
+          "Where are you?",
+          "How much?"
+        ],
+        policyTitle: "VEKOPAX Privacy Policy",
+        policyText: `
+          <p><strong>1. Data Security:</strong> We do not collect or store your personal information.</p>
+          <p><strong>2. Translation Processing:</strong> We use trusted third-party translation services to process text inputs in real-time. These services are used only to provide translation results.</p>
+          <p><strong>3. Local Storage:</strong> History and favorites are stored only on your device. We cannot access them remotely.</p>
+          <button class="btn-main" style="width:100%; justify-content:center; margin-top:20px;" onclick="toggleModal('pModal', false)" type="button">I UNDERSTAND</button>
+        `
+      }
+    };
+
+    function selectCountry(country) {
+      if (country === 'tz') {
+        currentUILang = "sw";
+      } else {
+        currentUILang = "en";
+      }
+
+      // Ficha skrini ya kuchagua nchi na uonyeshe app kuu
+      document.getElementById("splashScreen").style.display = "none";
+      document.getElementById("mainApp").style.display = "block";
+
+      changeUILanguage();
+      loadList("v_history", "historyContainer");
+      loadList("v_favs", "favContainer");
+      updateCharCount();
+    }
+
+    function escapeHtml(text) {
+      return String(text)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#39;");
+    }
+
+    function getCurrentTexts() {
+      return langData[currentUILang];
+    }
+
+    function isDefaultResultText(text) {
+      return text === langData.sw.resultDefault ||
+             text === langData.en.resultDefault ||
+             text === langData.sw.translating ||
+             text === langData.en.translating ||
+             text === langData.sw.errorText ||
+             text === langData.en.errorText;
+    }
+
+    function changeUILanguage() {
+      const t = getCurrentTexts();
+
+      document.documentElement.lang = t.htmlLang;
+      document.getElementById("userInput").placeholder = t.placeholder;
+
+      const resultEl = document.getElementById("resultText");
+      if (isDefaultResultText(resultEl.innerText.trim())) {
+        resultEl.innerText = t.resultDefault;
+      }
+
+      document.getElementById("translateBtn").querySelector("span").innerText = t.btnTranslate;
+      document.getElementById("textHist").innerText = t.history;
+      document.getElementById("textFav").innerText = t.favs;
+      document.getElementById("btnClearFav").innerText = t.clearAll;
+      document.getElementById("btnClearHist").innerText = t.clearHist;
+      document.getElementById("textPrivacy").innerText = t.privacyLink;
+      document.getElementById("confirmTitle").innerText = t.confirmTitle;
+      document.getElementById("confirmMsg").innerText = t.confirmMsg;
+      document.getElementById("btnCancel").innerText = t.btnCancel;
+      document.getElementById("confirmBtn").innerText = t.btnDelete;
+      document.getElementById("phraseLabel").innerText = t.phraseLabel;
+      document.getElementById("privacyContent").innerHTML = `<h2>${t.policyTitle}</h2>${t.policyText}`;
+
+      document.querySelectorAll("#langOption option").forEach(opt => {
+        opt.text = currentUILang === "sw" ? opt.getAttribute("data-sw") : opt.getAttribute("data-en");
+      });
+
+      renderQuickPhrases();
+      loadList("v_history", "historyContainer");
+      loadList("v_favs", "favContainer");
+    }
+
+    function renderQuickPhrases() {
+      const container = document.getElementById("phraseContainer");
+      const phrases = getCurrentTexts().phrases;
+      container.innerHTML = "";
+
+      phrases.forEach(phrase => {
+        const btn = document.createElement("button");
+        btn.className = "phrase-chip";
+        btn.type = "button";
+        btn.textContent = phrase;
+        btn.onclick = () => fillPhrase(phrase);
+        container.appendChild(btn);
+      });
+    }
+
+    function fillPhrase(text) {
+      document.getElementById("userInput").value = text;
+      updateCharCount();
+    }
+
+    function updateCharCount() {
+      const len = document.getElementById("userInput").value.length;
+      document.getElementById("charCount").innerText = `${len} / 500`;
+    }
+
+    function swapLanguages() {
+      const select = document.getElementById("langOption");
+      const currentValue = select.value;
+      select.value = currentValue === "en-sw" ? "sw-en" : "en-sw";
+
+      const inputEl = document.getElementById("userInput");
+      const resultEl = document.getElementById("resultText");
+
+      const currentIn = inputEl.value.trim();
+      const currentOut = resultEl.innerText.trim();
+
+      if (currentIn && currentOut && !isDefaultResultText(currentOut)) {
+        inputEl.value = currentOut;
+        resultEl.innerText = currentIn;
+        currentTranslation = { orig: currentOut, tran: currentIn };
+        updateCharCount();
+      }
+    }
+
+    async function startTranslation() {
+      const input = document.getElementById("userInput").value.trim();
+      const mode = document.getElementById("langOption").value;
+      if (!input) return;
+
+      const resBox = document.getElementById("resultText");
+      const t = getCurrentTexts();
+
+      resBox.style.opacity = "0.55";
+      resBox.innerText = t.translating;
+
+      try {
+        const [sl, tl] = mode.split("-");
+        const url = `https://translate.googleapis.com/translate_a/single?client=gtx&sl=${sl}&tl=${tl}&dt=t&q=${encodeURIComponent(input)}`;
+        const response = await fetch(url);
+        if (!response.ok) throw new Error("Request failed");
+
+        const data = await response.json();
+        const translated = Array.isArray(data?.[0]) ? data[0].map(x => x[0]).join("") : "";
+
+        if (!translated) throw new Error("Empty response");
+
+        resBox.style.opacity = "1";
+        resBox.innerText = translated;
+        currentTranslation = { orig: input, tran: translated };
+        saveToList("v_history", currentTranslation);
+      } catch (e) {
+        resBox.style.opacity = "1";
+        resBox.innerText = t.errorText;
+      }
+    }
+
+    function saveToList(key, item) {
+      if (!item.orig || !item.tran) return;
+
+      let list = JSON.parse(localStorage.getItem(key) || "[]");
+      list = list.filter(i => !(i.orig === item.orig && i.tran === item.tran));
+      list.unshift(item);
+
+      if (list.length > 50) list = list.slice(0, 50);
+
+      localStorage.setItem(key, JSON.stringify(list));
+      loadList(key, key === "v_history" ? "historyContainer" : "favContainer");
+    }
+
+    function loadList(key, containerId) {
+      const container = document.getElementById(containerId);
+      const list = JSON.parse(localStorage.getItem(key) || "[]");
+      const t = getCurrentTexts();
+
+      if (key === "v_favs") {
+        document.getElementById("favCard").style.display = list.length > 0 ? "block" : "none";
+      }
+
+      if (list.length === 0) {
+        const emptyText = key === "v_history" ? t.emptyHistory : t.emptyFavs;
+        container.innerHTML = `<div class="empty-state">${escapeHtml(emptyText)}</div>`;
+        return;
+      }
+
+      container.innerHTML = list.map((h, index) => `
+        <div class="list-item" onclick="reFillByIndex('${key}', ${index})">
+          <span class="orig-text">${escapeHtml(h.orig)}</span>
+          <span class="tran-text">${escapeHtml(h.tran)}</span>
+        </div>
+      `).join("");
+    }
+
+    function reFillByIndex(key, index) {
+      const list = JSON.parse(localStorage.getItem(key) || "[]");
+      const item = list[index];
+      if (!item) return;
+
+      document.getElementById("userInput").value = item.orig;
+      document.getElementById("resultText").innerText = item.tran;
+      currentTranslation = { orig: item.orig, tran: item.tran };
+      updateCharCount();
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function toggleFavorite() {
+      if (!currentTranslation.orig || !currentTranslation.tran) return;
+
+      const favIcon = document.getElementById("favIcon");
+      favIcon.innerText = "star";
+      favIcon.style.color = "var(--accent)";
+      saveToList("v_favs", currentTranslation);
+    }
+
+    async function copyResult() {
+      const text = document.getElementById("resultText").innerText.trim();
+      if (!text || isDefaultResultText(text)) return;
+
+      const icon = document.getElementById("copyIcon");
+
+      try {
+        if (navigator.clipboard && window.isSecureContext) {
+          await navigator.clipboard.writeText(text);
+        } else {
+          const temp = document.createElement("textarea");
+          temp.value = text;
+          temp.style.position = "fixed";
+          temp.style.left = "-9999px";
+          document.body.appendChild(temp);
+          temp.focus();
+          temp.select();
+          document.execCommand("copy");
+          document.body.removeChild(temp);
+        }
+
+        icon.innerText = "done";
+        setTimeout(() => {
+          icon.innerText = "content_copy";
+        }, 1600);
+      } catch (e) {
+        icon.innerText = "content_copy";
+      }
+    }
+
+    function clearField() {
+      document.getElementById("userInput").value = "";
+      document.getElementById("resultText").innerText = getCurrentTexts().resultDefault;
+      document.getElementById("favIcon").innerText = "star_border";
+      document.getElementById("favIcon").style.color = "var(--text-sub)";
+      currentTranslation = { orig: "", tran: "" };
+      updateCharCount();
+    }
+
+    function openConfirm() {
+      document.getElementById("confirmBtn").onclick = () => {
+        localStorage.removeItem("v_history");
+        loadList("v_history", "historyContainer");
+        toggleModal("confirmDialog", false);
+      };
+      toggleModal("confirmDialog", true);
+    }
+
+    function clearAllItems(key) {
+      localStorage.removeItem(key);
+      loadList(key, key === "v_history" ? "historyContainer" : "favContainer");
+    }
+
+    function toggleModal(id, show) {
+      document.getElementById(id).style.display = show ? "block" : "none";
+    }
+
+    function handleBackdropClose(event, id) {
+      if (event.target.id === id) {
+        toggleModal(id, false);
+      }
+    }
+  </script>
+</body>
+</html>
